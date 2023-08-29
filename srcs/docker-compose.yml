@@ -1,0 +1,69 @@
+version: "3"
+
+# services:
+#   mariadb:
+#     image: mariadb                used to specify the image that will be used to create the container  
+#     container_name: mariadb       used to specify the name of the container
+#     build: requirements/mariadb   used to specify the path to the Dockerfile
+#     restart: always               used to specify that the container should restart if it crashes
+#     volumes:
+#       - db:/var/lib/mysql         used to specify the volume that will be used to store the data 
+#     networks:
+#       - lenetwork                 used to specify the network that the container will be connected to
+#     env_file:
+#       - .env                      used to specify the file that contains the environment variables
+
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    build: requirements/mariadb
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - lenetwork
+    env_file:
+      - .env
+  nxinx:
+    image: nginx
+    container_name: nginx
+    build: requirements/nginx
+    restart: always
+    volumes:
+      - wp:/var/www/wordpress
+    networks:
+      - lenetwork
+    depends_on:
+      - wordpress
+    ports:
+      - "433:433"
+  wordpress:
+    image: wordpress
+    container_name: wordpress
+    build: requirements/wordpress
+    restart: always
+    volumes:
+      - wp:/var/www/wordpress
+    networks:
+      - lenetwork
+    env_file:
+      - .env
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/pderksen/data/mariadb
+  wp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/pderksen/data/wordpress
+      
+networks:
+  lenetwork:
