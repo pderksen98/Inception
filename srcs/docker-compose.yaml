@@ -9,7 +9,7 @@ services:
     volumes:
       - db:/var/lib/mysql
     networks:
-      - lenetwork
+      - inception_network
     env_file:
       - .env
   nginx:
@@ -20,7 +20,7 @@ services:
     volumes:
       - wp:/var/www/wordpress
     networks:
-      - lenetwork
+      - inception_network
     depends_on:
       - wordpress
     ports:
@@ -33,7 +33,7 @@ services:
     volumes:
       - wp:/var/www/wordpress
     networks:
-      - lenetwork
+      - inception_network
     env_file:
       - .env
 
@@ -52,4 +52,4 @@ volumes:
       device: /Users/pieterderksen/data/wordpress
 
 networks:
-  lenetwork:
+  inception_network:
