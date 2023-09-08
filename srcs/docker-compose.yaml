@@ -1,0 +1,55 @@
+version: "3"
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    build: requirements/mariadb/
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - lenetwork
+    env_file:
+      - .env
+  nginx:
+    image: nginx
+    container_name: nginx
+    build: requirements/nginx
+    restart: always
+    volumes:
+      - wp:/var/www/wordpress
+    networks:
+      - lenetwork
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+  wordpress:
+    image: wordpress
+    container_name: wordpress
+    build: requirements/wordpress
+    restart: always
+    volumes:
+      - wp:/var/www/wordpress
+    networks:
+      - lenetwork
+    env_file:
+      - .env
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/pieterderksen/data/mariadb
+  wp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/pieterderksen/data/wordpress
+
+networks:
+  lenetwork:

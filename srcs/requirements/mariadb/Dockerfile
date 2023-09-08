@@ -1,19 +1,27 @@
+# sets the base image for the container as debian:buster
 FROM debian:buster
 
-Run apt-get update && apt-get upgrade -y
-RUN apt-get install -y mariadb-server mariadb-client nano
+# updating the package lists for upgrades and new package installations && upgrading the installed packages
+RUN apt-get update && apt-get upgrade -y
+# installing mariadb-server, mariadb-client
+RUN apt-get install -y mariadb-server mariadb-client
 
+# copies the db_setup.sh script from the tools directory on host to the /tmp/ directory inside the container
 COPY tools/db_setup.sh /tmp/
-
-#makes setup script executable
+# making the db_setup.sh script executable
 RUN chmod +x /tmp/db_setup.sh
 
-#changes the bind address, meaning that the server will listen to all incoming connections
-RUN sed 's/bind-address = 127.0.0.1/bind-address = 0.0.0.0/' -i etc/mysql/mariadb.conf.d/50-server.cnf
-#removes the skip-networking line, so that the database can be accessed from outside the container
-RUN sed 's/skip-networking/#skip-networking/' -i etc/mysql/mariadb.conf.d/50-server.cnf
+# using sed to modify the MariaDB configuration:
+# change the bind-address to 0.0.0.0 to allow connections from any IP address
+RUN sed 's/bind-address            = 127.0.0.1/bind-address            = 0.0.0.0/' -i  /etc/mysql/mariadb.conf.d/50-server.cnf
+# comment out the skip-networking line to allow network-based connections
+RUN sed 's/skip-networking/#skip-networking/g' -i  /etc/mysql/mariadb.conf.d/50-server.cnf 
 
-#The square brackets around the path instructs the entrypoint to execute the script with exec rather than sh.
-#The exec command replaces the current process with the new process, i.e. PID 1. 
-#This is important as it allows the container to receive signals from the host and properly shut down.
+# sets the entry point for the container to be the db_setup.sh script
+# this script will be executed when the container starts
 ENTRYPOINT ["/tmp/db_setup.sh"]
+
+
+# Packages:
+# - mariadb-server: 
+# - mariadb-client: 

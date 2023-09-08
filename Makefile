@@ -3,31 +3,26 @@ PROJECT = inception
 LIST_CONTAINERS := $(shell docker ps -a -q)
 LIST_VOLUMES := $(shell docker volume ls -q)
 
-all: up
+all: debian up
 
 up:
-	mkdir -p /home/pderksen/data/mariadb
-	mkdir -p /home/pderksen/data/wordpress
-	docker-compose -f src/docker-compose.yml up --build
+	mkdir -p /Users/pieterderksen/data/mariadb
+	mkdir -p /Users/pieterderksen/data/wordpress
+	sudo docker compose -f srcs/docker-compose.yaml up --build
 
 stop:
-	docker-compose -f src/docker-compose.yml stop
+	docker compose -f srcs/docker-compose.yaml stop
 
 kill:
-	docker-compose -f src/docker-compose.yml kill
+	docker compose -f srcs/docker-compose.yaml kill
 
 reset:
-	docker-compose -f src/docker-compose.yml down
+	docker compose -f srcs/docker-compose.yaml down
 	docker rm -f $(LIST_CONTAINERS)
 	docker volume rm -f $(LIST_VOLUMES)
-	rm -rf /home/pderksen/data
+	rm -rf /Users/pieterderksen/data
+
+debian: 
+	sudo docker pull debian:buster
 
 re: reset up
-
-# - up: makes two directories for the database and wordpress files, ....
-# ..... and then starts calls docker-compose up to start the containers
-# - stop: calls docker-compose stop to stop the containers
-# - kill: calls docker-compose kill to kill the containers
-# - reset: calls docker-compose down to remove the containers, then removes all ....
-# ..... containers and volumes, and finally removes the two directories for the database and wordpress files
-# - re: calls reset and then up

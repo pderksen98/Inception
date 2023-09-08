@@ -1,21 +1,22 @@
+# sets the base image for the container as debian:buster
 FROM debian:buster
 
-#update packeage list and install packages
+# updating the package lists for upgrades and new package installations
 RUN apt-get update
+# installing nginx, openssl, curl, libfcgi0ldbl
 RUN apt-get install -y nginx openssl curl
-#this package is needed to run the wp-cli.phar file
 RUN apt-get -y install libfcgi0ldbl
 
-#copy configuration file and start.sh from the host to the container
+# copying the custom nginx.conf to the container's /etc/nginx/sites-available/ directory and naming it default.conf
 COPY conf/nginx.conf /etc/nginx/sites-available/default.conf
+# copy start.sh script to the root directory of the container
 COPY start.sh .
-#makes start.sh executable
+# making the start.sh script executable
 RUN chmod +x start.sh
 
-#ln is used to create symbolic link from configuration file to the sites-enabled directory
-#This is needed so that the configuration file is used by nginx
+# ln is used to create symbolic link from configuration file to the sites-enabled directory
+# this is needed so that the configuration file is used by nginx
 RUN ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default.conf
-
 #openssl is used to generate the certificate and key files that are used in the configuration file
 #the -nodes option is used to make the cerftificate and key file not password protected
 #the -newkey option is used to specify the type of key to generate
@@ -26,7 +27,14 @@ RUN ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/defau
 #the subject is set to pderksen.42.fr as required by the subject
 RUN openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/nginx/key.key -out /etc/nginx/crt.crt -subj "/CN=pderksen.42.fr"
 
+# container will listen on port 443 (common for https)
 EXPOSE 443
 
-#as like in the wordpress and mariadb containers, the entrypoint is execture with exec rather than sh
+# sets the entry point for the container to be the start.sh script
 ENTRYPOINT [ "./start.sh" ]
+
+# Packages:
+# - nginx: server
+# - openssl: SSL/TLS operations
+# - curl: command line tool for transferring data with URL syntax
+# - libfcgi0ldbl: FastCGI library
