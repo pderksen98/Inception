@@ -18,3 +18,8 @@ then
 fi
 echo "Wordpress started"
 php-fpm7.3 -R -F #runs on the foreground as root
+
+
+# the wp core download --allow-root command uses the
+# wP-CLI (WordPress Command-Line Interface) to download the latest version of WordPress 
+# and unzips it into the current directory (see setup script: /var/www/wordpress)
