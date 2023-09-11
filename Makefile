@@ -23,6 +23,6 @@ reset:
 	rm -rf /Users/pieterderksen/data
 
 debian: 
-	sudo docker pull debian:buster
+	docker pull debian:buster
 
 re: reset up
